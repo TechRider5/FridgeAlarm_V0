@@ -93,6 +93,8 @@
 #define REST     0
 
 const int PiezoPin = 17;
+unsigned long lastSongChange = 0;
+int currentSongIndex = 0;
 
 // Super Mario Bros theme
 int mario_melody[] = {
@@ -117,29 +119,6 @@ int mario_durations[] = {
   100, 100, 100, 100
 };
 
-// Jingle Bells
-int jingle_melody[] = {
-  NOTE_E5, NOTE_E5, NOTE_E5,
-  NOTE_E5, NOTE_E5, NOTE_E5,
-  NOTE_E5, NOTE_G5, NOTE_C5, NOTE_D5,
-  NOTE_E5, 0,
-  NOTE_F5, NOTE_F5, NOTE_F5, NOTE_F5,
-  NOTE_F5, NOTE_E5, NOTE_E5, NOTE_E5, NOTE_E5,
-  NOTE_E5, NOTE_D5, NOTE_D5, NOTE_E5,
-  NOTE_D5, NOTE_G5
-};
-
-int jingle_durations[] = {
-  200, 200, 400,
-  200, 200, 400,
-  200, 200, 200, 200,
-  400, 200,
-  200, 200, 200, 200,
-  200, 200, 200, 100, 100,
-  200, 200, 200, 200,
-  400, 400
-};
-
 // Imperial March
 int imperial_melody[] = {
   NOTE_A4, NOTE_A4, NOTE_A4,
@@ -159,19 +138,19 @@ int imperial_durations[] = {
   250, 100, 300
 };
 
-// Twinkle Twinkle
-int twinkle_melody[] = {
-  NOTE_C4, NOTE_C4, NOTE_G4, NOTE_G4,
-  NOTE_A4, NOTE_A4, NOTE_G4, 0,
-  NOTE_F4, NOTE_F4, NOTE_E4, NOTE_E4,
-  NOTE_D4, NOTE_D4, NOTE_C4, 0
+// Happy Birthday melody
+int birthday_melody[] = {
+  NOTE_C4, NOTE_C4, NOTE_D4, NOTE_C4, NOTE_F4, NOTE_E4,
+  NOTE_C4, NOTE_C4, NOTE_D4, NOTE_C4, NOTE_G4, NOTE_F4,
+  NOTE_C4, NOTE_C4, NOTE_C5, NOTE_A4, NOTE_F4, NOTE_E4, NOTE_D4,
+  NOTE_B4, NOTE_B4, NOTE_A4, NOTE_F4, NOTE_G4, NOTE_F4
 };
 
-int twinkle_durations[] = {
-  300, 300, 300, 300,
-  300, 300, 600, 200,
-  300, 300, 300, 300,
-  300, 300, 600, 200
+int birthday_durations[] = {
+  200, 200, 400, 400, 400, 800,
+  200, 200, 400, 400, 400, 800,
+  200, 200, 400, 400, 400, 400, 400,
+  200, 200, 400, 400, 400, 800
 };
 
 // Variables to store the selected song
@@ -193,40 +172,49 @@ void playSong() {
 }
 
 void selectRandomSong() {
-  int song_choice = random(4); // 0-3 for four songs
+  // Get random noise from unconnected analog pin
+  int noise1 = analogRead(0);
+  delay(100);
+  int noise2 = analogRead(0);
+  delay(100);
+  int noise3 = analogRead(0);
   
-  switch(song_choice) {
+  // Use the noise to select a random song (0-2)
+  currentSongIndex = ((noise1 + noise2 + noise3) & 0x7) % 3;
+  
+  switch(currentSongIndex) {
     case 0:
       current_melody = mario_melody;
       current_durations = mario_durations;
       current_song_length = sizeof(mario_melody) / sizeof(mario_melody[0]);
       break;
     case 1:
-      current_melody = jingle_melody;
-      current_durations = jingle_durations;
-      current_song_length = sizeof(jingle_melody) / sizeof(jingle_melody[0]);
-      break;
-    case 2:
       current_melody = imperial_melody;
       current_durations = imperial_durations;
       current_song_length = sizeof(imperial_melody) / sizeof(imperial_melody[0]);
       break;
-    case 3:
-      current_melody = twinkle_melody;
-      current_durations = twinkle_durations;
-      current_song_length = sizeof(twinkle_melody) / sizeof(twinkle_melody[0]);
+    case 2:
+      current_melody = birthday_melody;
+      current_durations = birthday_durations;
+      current_song_length = sizeof(birthday_melody) / sizeof(birthday_melody[0]);
       break;
   }
 }
 
 void setup() {
-  delay(15000); 
   pinMode(PiezoPin, OUTPUT);
-  randomSeed(analogRead(0)); // Initialize random number generator with noise from analog pin
-  selectRandomSong(); // Choose a random song on startup
+  delay(15000);  // Initial delay
+  selectRandomSong(); // Choose first random song
+  lastSongChange = millis();
 }
 
 void loop() {
+  // Change to a new random song every 5 seconds
+  if (millis() - lastSongChange >= 5000) {
+    selectRandomSong();
+    lastSongChange = millis();
+  }
+  
   playSong();
   delay(5000); // Wait 5 seconds before playing again
 } 
