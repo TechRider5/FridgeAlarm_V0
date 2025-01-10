@@ -96,61 +96,49 @@ const int PiezoPin = 17;
 unsigned long lastSongChange = 0;
 int currentSongIndex = 0;
 
-// Super Mario Bros theme
-int mario_melody[] = {
-  NOTE_E7, NOTE_E7, 0, NOTE_E7,
-  0, NOTE_C7, NOTE_E7, 0,
-  NOTE_G7, 0, 0, 0,
-  NOTE_G6, 0, 0, 0,
-  NOTE_C7, 0, 0, NOTE_G6,
-  0, 0, NOTE_E6, 0,
-  0, NOTE_A6, 0, NOTE_B6,
-  0, NOTE_AS6, NOTE_A6, 0
+// Brahms' Lullaby
+int lullaby_melody[] = {
+  NOTE_G4, NOTE_G4, NOTE_AS4, NOTE_G4, NOTE_DS4, NOTE_C4,
+  NOTE_G4, NOTE_G4, NOTE_AS4, NOTE_G4, NOTE_DS4,
+  NOTE_G4, NOTE_G4, NOTE_G5, NOTE_DS5, NOTE_C5, NOTE_AS4, NOTE_F4, NOTE_DS4,
+  NOTE_C4
 };
 
-int mario_durations[] = {
-  100, 100, 100, 100,
-  100, 100, 100, 100,
-  100, 100, 100, 100,
-  100, 100, 100, 100,
-  100, 100, 100, 100,
-  100, 100, 100, 100,
-  100, 100, 100, 100,
-  100, 100, 100, 100
+int lullaby_durations[] = {
+  400, 400, 400, 400, 400, 800,
+  400, 400, 400, 400, 800,
+  400, 400, 400, 400, 400, 400, 400, 400,
+  800
 };
 
-// Imperial March
-int imperial_melody[] = {
-  NOTE_A4, NOTE_A4, NOTE_A4,
-  NOTE_F4, NOTE_C5, NOTE_A4,
-  NOTE_F4, NOTE_C5, NOTE_A4,
-  NOTE_E5, NOTE_E5, NOTE_E5,
-  NOTE_F5, NOTE_C5, NOTE_GS4,
-  NOTE_F4, NOTE_C5, NOTE_A4
+// Greensleeves
+int greensleeves_melody[] = {
+  NOTE_G4, NOTE_AS4, NOTE_C5, NOTE_D5,
+  NOTE_DS5, NOTE_D5, NOTE_C5, NOTE_A4,
+  NOTE_F4, NOTE_G4, NOTE_A4, NOTE_AS4,
+  NOTE_G4, NOTE_F4, NOTE_G4
 };
 
-int imperial_durations[] = {
-  300, 300, 300,
-  250, 100, 300,
-  250, 100, 300,
-  300, 300, 300,
-  250, 100, 300,
-  250, 100, 300
+int greensleeves_durations[] = {
+  400, 400, 200, 600,
+  200, 200, 200, 600,
+  200, 200, 200, 600,
+  200, 200, 800
 };
 
-// Happy Birthday melody
-int birthday_melody[] = {
-  NOTE_C4, NOTE_C4, NOTE_D4, NOTE_C4, NOTE_F4, NOTE_E4,
-  NOTE_C4, NOTE_C4, NOTE_D4, NOTE_C4, NOTE_G4, NOTE_F4,
-  NOTE_C4, NOTE_C4, NOTE_C5, NOTE_A4, NOTE_F4, NOTE_E4, NOTE_D4,
-  NOTE_B4, NOTE_B4, NOTE_A4, NOTE_F4, NOTE_G4, NOTE_F4
+// Pachelbel's Canon in D
+int canon_melody[] = {
+  NOTE_D4, NOTE_A4, NOTE_B4, NOTE_FS4,
+  NOTE_G4, NOTE_D4, NOTE_G4, NOTE_A4,
+  NOTE_D4, NOTE_A4, NOTE_B4, NOTE_FS4,
+  NOTE_G4, NOTE_D4, NOTE_G4, NOTE_A4
 };
 
-int birthday_durations[] = {
-  200, 200, 400, 400, 400, 800,
-  200, 200, 400, 400, 400, 800,
-  200, 200, 400, 400, 400, 400, 400,
-  200, 200, 400, 400, 400, 800
+int canon_durations[] = {
+  500, 500, 500, 500,
+  500, 500, 500, 500,
+  500, 500, 500, 500,
+  500, 500, 500, 500
 };
 
 // Variables to store the selected song
@@ -167,7 +155,7 @@ void playSong() {
       delay(current_durations[i]);
       noTone(PiezoPin);
     }
-    delay(50); // Short pause between notes
+    delay(100); // Longer pause between notes for calmer feel
   }
 }
 
@@ -184,19 +172,19 @@ void selectRandomSong() {
   
   switch(currentSongIndex) {
     case 0:
-      current_melody = mario_melody;
-      current_durations = mario_durations;
-      current_song_length = sizeof(mario_melody) / sizeof(mario_melody[0]);
+      current_melody = lullaby_melody;
+      current_durations = lullaby_durations;
+      current_song_length = sizeof(lullaby_melody) / sizeof(lullaby_melody[0]);
       break;
     case 1:
-      current_melody = imperial_melody;
-      current_durations = imperial_durations;
-      current_song_length = sizeof(imperial_melody) / sizeof(imperial_melody[0]);
+      current_melody = greensleeves_melody;
+      current_durations = greensleeves_durations;
+      current_song_length = sizeof(greensleeves_melody) / sizeof(greensleeves_melody[0]);
       break;
     case 2:
-      current_melody = birthday_melody;
-      current_durations = birthday_durations;
-      current_song_length = sizeof(birthday_melody) / sizeof(birthday_melody[0]);
+      current_melody = canon_melody;
+      current_durations = canon_durations;
+      current_song_length = sizeof(canon_melody) / sizeof(canon_melody[0]);
       break;
   }
 }
@@ -209,8 +197,8 @@ void setup() {
 }
 
 void loop() {
-  // Change to a new random song every 5 seconds
-  if (millis() - lastSongChange >= 5000) {
+  // Change to a new random song every 10 seconds (longer for calmer transitions)
+  if (millis() - lastSongChange >= 10000) {
     selectRandomSong();
     lastSongChange = millis();
   }
