@@ -95,13 +95,13 @@
 const int PiezoPin = 17;
 unsigned long lastSongChange = 0;
 
-// Simple ding melody using lowest possible notes
+// Quick ding melody using lowest possible notes
 int ding_melody[] = {
   NOTE_C1, REST, NOTE_C1, REST, NOTE_C1
 };
 
 int ding_durations[] = {
-  200, 800, 200, 800, 200
+  100, 300, 100, 300, 100  // Shorter durations
 };
 
 // Variables to store the selected song
@@ -114,7 +114,7 @@ void playSong() {
     if (current_melody[i] == 0) {
       delay(current_durations[i]);
     } else {
-      // Absolute minimum volume possible
+      // Keep volume at minimum
       analogWrite(PiezoPin, 2);  // Bare minimum duty cycle
       tone(PiezoPin, current_melody[i], current_durations[i] * 0.2);  // Very short notes
       delay(current_durations[i] * 0.2);
@@ -122,7 +122,7 @@ void playSong() {
       analogWrite(PiezoPin, 0);
       delay(current_durations[i] * 0.8);  // Mostly silence
     }
-    delay(800); // Very long pause between dings
+    delay(200); // Shorter pause between dings
   }
 }
 
@@ -133,5 +133,5 @@ void setup() {
 
 void loop() {
   playSong();
-  delay(8000); // Long wait before repeating
+  delay(3000); // Shorter wait before repeating
 } 
