@@ -97,11 +97,11 @@ unsigned long lastSongChange = 0;
 
 // Quick ding melody using lowest possible notes
 int ding_melody[] = {
-  NOTE_C1, NOTE_D1, NOTE_C1, NOTE_D1, NOTE_C1
+  NOTE_B0, NOTE_B0, NOTE_B0, NOTE_B0, NOTE_B0
 };
 
 int ding_durations[] = {
-  100, 300, 100, 300, 100  // Shorter durations
+  300, 200, 300, 200, 300  // Shorter durations
 };
 
 // Variables to store the selected song
