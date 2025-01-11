@@ -94,115 +94,44 @@
 
 const int PiezoPin = 17;
 unsigned long lastSongChange = 0;
-int currentSongIndex = 0;
 
-// Brahms' Lullaby
-int lullaby_melody[] = {
-  NOTE_G4, NOTE_G4, NOTE_AS4, NOTE_G4, NOTE_DS4, NOTE_C4,
-  NOTE_G4, NOTE_G4, NOTE_AS4, NOTE_G4, NOTE_DS4,
-  NOTE_G4, NOTE_G4, NOTE_G5, NOTE_DS5, NOTE_C5, NOTE_AS4, NOTE_F4, NOTE_DS4,
-  NOTE_C4
+// Simple ding melody using lowest possible notes
+int ding_melody[] = {
+  NOTE_C1, REST, NOTE_C1, REST, NOTE_C1
 };
 
-int lullaby_durations[] = {
-  400, 400, 400, 400, 400, 800,
-  400, 400, 400, 400, 800,
-  400, 400, 400, 400, 400, 400, 400, 400,
-  800
-};
-
-// Greensleeves
-int greensleeves_melody[] = {
-  NOTE_G4, NOTE_AS4, NOTE_C5, NOTE_D5,
-  NOTE_DS5, NOTE_D5, NOTE_C5, NOTE_A4,
-  NOTE_F4, NOTE_G4, NOTE_A4, NOTE_AS4,
-  NOTE_G4, NOTE_F4, NOTE_G4
-};
-
-int greensleeves_durations[] = {
-  400, 400, 200, 600,
-  200, 200, 200, 600,
-  200, 200, 200, 600,
-  200, 200, 800
-};
-
-// Pachelbel's Canon in D
-int canon_melody[] = {
-  NOTE_D4, NOTE_A4, NOTE_B4, NOTE_FS4,
-  NOTE_G4, NOTE_D4, NOTE_G4, NOTE_A4,
-  NOTE_D4, NOTE_A4, NOTE_B4, NOTE_FS4,
-  NOTE_G4, NOTE_D4, NOTE_G4, NOTE_A4
-};
-
-int canon_durations[] = {
-  500, 500, 500, 500,
-  500, 500, 500, 500,
-  500, 500, 500, 500,
-  500, 500, 500, 500
+int ding_durations[] = {
+  200, 800, 200, 800, 200
 };
 
 // Variables to store the selected song
-int* current_melody;
-int* current_durations;
-int current_song_length;
+int* current_melody = ding_melody;
+int* current_durations = ding_durations;
+int current_song_length = sizeof(ding_melody) / sizeof(ding_melody[0]);
 
 void playSong() {
   for (int i = 0; i < current_song_length; i++) {
     if (current_melody[i] == 0) {
       delay(current_durations[i]);
     } else {
-      tone(PiezoPin, current_melody[i]);
-      delay(current_durations[i]);
+      // Absolute minimum volume possible
+      analogWrite(PiezoPin, 2);  // Bare minimum duty cycle
+      tone(PiezoPin, current_melody[i], current_durations[i] * 0.2);  // Very short notes
+      delay(current_durations[i] * 0.2);
       noTone(PiezoPin);
+      analogWrite(PiezoPin, 0);
+      delay(current_durations[i] * 0.8);  // Mostly silence
     }
-    delay(100); // Longer pause between notes for calmer feel
-  }
-}
-
-void selectRandomSong() {
-  // Get random noise from unconnected analog pin
-  int noise1 = analogRead(0);
-  delay(100);
-  int noise2 = analogRead(0);
-  delay(100);
-  int noise3 = analogRead(0);
-  
-  // Use the noise to select a random song (0-2)
-  currentSongIndex = ((noise1 + noise2 + noise3) & 0x7) % 3;
-  
-  switch(currentSongIndex) {
-    case 0:
-      current_melody = lullaby_melody;
-      current_durations = lullaby_durations;
-      current_song_length = sizeof(lullaby_melody) / sizeof(lullaby_melody[0]);
-      break;
-    case 1:
-      current_melody = greensleeves_melody;
-      current_durations = greensleeves_durations;
-      current_song_length = sizeof(greensleeves_melody) / sizeof(greensleeves_melody[0]);
-      break;
-    case 2:
-      current_melody = canon_melody;
-      current_durations = canon_durations;
-      current_song_length = sizeof(canon_melody) / sizeof(canon_melody[0]);
-      break;
+    delay(800); // Very long pause between dings
   }
 }
 
 void setup() {
   pinMode(PiezoPin, OUTPUT);
   delay(15000);  // Initial delay
-  selectRandomSong(); // Choose first random song
-  lastSongChange = millis();
 }
 
 void loop() {
-  // Change to a new random song every 10 seconds (longer for calmer transitions)
-  if (millis() - lastSongChange >= 10000) {
-    selectRandomSong();
-    lastSongChange = millis();
-  }
-  
   playSong();
-  delay(5000); // Wait 5 seconds before playing again
+  delay(8000); // Long wait before repeating
 } 
