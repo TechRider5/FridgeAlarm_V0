@@ -128,7 +128,7 @@ void playSong() {
 
 void setup() {
   pinMode(PiezoPin, OUTPUT);
-  delay(15000);  // Initial delay
+  delay(30000);  // 30 second initial delay
 }
 
 void loop() {
